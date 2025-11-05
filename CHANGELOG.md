@@ -4,7 +4,7 @@ Created repo.
 
 # Unreleased
 
-[ ] Decide about cli interface (dialoguer?)
+[ ] Decide about cli interface (dialoguer?)\
 [ ] Implement `add_thesis`
 
 # History
