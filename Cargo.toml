@@ -1,0 +1,15 @@
+[package]
+name = "suv"
+version = "0.1.0"
+edition = "2024"
+description = "A tool to manage thesis supervisions"
+categories = ["command-line-utilities"]
+keywords = ["cli", "supervision", "thesis"]
+license = "GPL-3.0-only"
+repository = "https://github.com/Jakubzik/suv"
+homepage = "https://github.com/Jakubzik/suv"
+authors = ["Heiko Jakubzik <heiko.jakubzik@shj-online.de>", "Annika Elstermann <annika.elstermann@as.uni-heidelberg.de">]
+readme = "README.md"
+
+[dependencies]
+chrono = "0.4.38"
