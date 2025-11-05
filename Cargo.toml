@@ -8,7 +8,7 @@ keywords = ["cli", "supervision", "thesis"]
 license = "GPL-3.0-only"
 repository = "https://github.com/Jakubzik/suv"
 homepage = "https://github.com/Jakubzik/suv"
-authors = ["Heiko Jakubzik <heiko.jakubzik@shj-online.de>", "Annika Elstermann <annika.elstermann@as.uni-heidelberg.de">]
+authors = ["Heiko Jakubzik <heiko.jakubzik@shj-online.de>", "Annika Elstermann <annika.elstermann@as.uni-heidelberg.de>"]
 readme = "README.md"
 
 [dependencies]
