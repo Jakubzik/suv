@@ -33,8 +33,18 @@ impl Thesis {
             self.student.first_name, self.student.last_name
         ));
         text_lines.push(format!("Email: {}\n", self.student.email));
-        text_lines.push(format!("Submission planned: {:?}\n", self.abgabedatum));
-        text_lines.push(format!("Registration planned: {:?}\n", self.anmeldedatum));
+
+        if let Some(abgabe) = self.abgabedatum {
+            text_lines.push(format!("Submission planned: {}\n", abgabe.to_string()));
+        } else {
+            text_lines.push(format!("Submission planned: n\n"));
+        }
+
+        if let Some(anme) = self.anmeldedatum {
+            text_lines.push(format!("Registration planned: {}\n", anme.to_string()));
+        } else {
+            text_lines.push(format!("Registration planned: n\n"));
+        }
         text_lines.push(format!("Urgent grading? {}\n", self.schnell));
         text_lines.push(format!("Next appointment: {}\n", self.next_appointment));
         text_lines.push(format!("\n\n## To-Do (for me)\n\n{}", self.todo));
@@ -42,6 +52,7 @@ impl Thesis {
         text_lines.push(format!("\n\n## Next Steps\n\n{}", self.steps));
         text_lines.join("\n")
     }
+
     pub(crate) fn store_new(&self, config_path: &str) {
         let folder = format!(
             "{}/{}_{}",

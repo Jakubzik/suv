@@ -3,22 +3,21 @@ mod ui;
 mod utils;
 use std::{
     fs::{self, File},
-    io::{self, Write},
+    io::Write,
     path::Path,
 };
-
-use chrono::NaiveDate;
 
 use crate::{
     parser::between,
     ui::get_thesis_details_from_user,
-    utils::{ask_option, get_user_input},
+    utils::{FlexibleDate, ask_option, get_user_input},
 };
 
 // Linux only
 const EXIT_CODE_NO_HOME_DIR: i32 = 1;
 // const VERSION: &str = "0.0.2, Nov 7, 2025 (hj)";
-const VERSION: &str = "0.0.3, Dec 5, 2025 (hj)";
+// const VERSION: &str = "0.0.3, Dec 5, 2025 (hj)";
+const VERSION: &str = "0.0.4, Dec 14, 2025 (hj)";
 const CONFIG_FILE: &str = ".config/suv/suv.rc";
 
 fn main() {
@@ -73,8 +72,8 @@ impl Student {
 struct Thesis {
     student: Student,
     title: String,
-    abgabedatum: Option<NaiveDate>,
-    anmeldedatum: Option<NaiveDate>,
+    abgabedatum: Option<FlexibleDate>,
+    anmeldedatum: Option<FlexibleDate>,
     schnell: bool,
     interesse: String,
     steps: String,

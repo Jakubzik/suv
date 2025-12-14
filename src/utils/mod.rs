@@ -7,9 +7,17 @@ use crate::utils::globals::{
     get_current_month, get_current_weekday, get_year, read_as_day, read_as_month, today,
 };
 
+// @todo
+// - Bei eingegebenem Abgabedatum, ein Anmeldedatum -9 Wochen als Default
+// - Dateiproduktion verbessern
+// - jjjjjjjjjj
+
 // Sometimes you just want
 // "January 2026" as Date,
-#[derive(PartialEq, Debug)]
+//
+// This is stored internally as
+// January 1, 2026 with 'month_only' == true
+#[derive(PartialEq, Debug, Clone, Copy)]
 pub struct FlexibleDate {
     datum: NaiveDate,
     month_only: bool,
@@ -31,7 +39,6 @@ impl FlexibleDate {
             let mut i_next_year = 0;
             if words.len() > 1 {
                 if let Ok(yr) = words[1].parse::<usize>() {
-                    println!("HERE, TOO! : {}", &yr);
                     i_next_year = yr;
                 }
             }
@@ -60,6 +67,13 @@ impl FlexibleDate {
             });
         }
         return None;
+    }
+
+    pub fn to_string(&self) -> String {
+        match self.month_only {
+            true => self.datum.format("%m %Y").to_string(),
+            _ => self.datum.format("%d.%m.%Y").to_string(),
+        }
     }
 }
 
@@ -98,10 +112,16 @@ mod test_parsing {
             datum: NaiveDate::parse_from_str("1.12.2027", "%d.%m.%Y").unwrap(),
             month_only: true,
         };
+        let s_test_5 = "März";
+        let fd_5 = FlexibleDate {
+            datum: NaiveDate::parse_from_str(&format!("1.3.{}", get_year(1)), "%d.%m.%Y").unwrap(),
+            month_only: true,
+        };
         assert_eq!(FlexibleDate::from_str_future(&s_test_1), Some(fd_1));
         assert_eq!(FlexibleDate::from_str_future(&s_test_2), Some(fd_2));
         assert_eq!(FlexibleDate::from_str_future(&s_test_3), None);
         assert_eq!(FlexibleDate::from_str_future(&s_test_4), Some(fd_4));
+        assert_eq!(FlexibleDate::from_str_future(&s_test_5), Some(fd_5));
     }
 
     #[test]
@@ -152,29 +172,34 @@ pub(crate) fn get_user_input(question: &str, default: &str) -> String {
     }
 }
 
+// Möchte der Nutzer ein Datum erfassen?
 pub(crate) fn get_optional_user_date(
     question: &str,
-    default: &Option<NaiveDate>,
-) -> Option<NaiveDate> {
-    println!("suv -> {}", question);
+    default: &Option<FlexibleDate>,
+) -> Option<FlexibleDate> {
+    let mut prompt = format!("suv -> {}", question);
 
-    return None;
+    // return None;
     // @todo
-    // if !default.is_empty() {
-    //     println!("(Empty for `{}`)", &default);
-    // }
+    if let Some(def) = default {
+        prompt = format!("{} [{} -- `n` für leer])", &prompt, &def.to_string());
+    }
 
-    // let mut line = String::from(" ");
+    let mut line = String::from(" ");
+    println!("{}", prompt);
 
-    // io::stdin()
-    //     .read_line(&mut line)
-    //     .expect("Something went wrong trying to read your input"); // @todo
+    io::stdin()
+        .read_line(&mut line)
+        .expect("Something went wrong trying to read your input"); // @todo
 
-    // if line.trim().is_empty() {
-    //     return default.to_string();
-    // } else {
-    //     return line.trim().to_string();
-    // }
+    if line.is_empty() {
+        return *default;
+    }
+
+    if &line.to_ascii_lowercase() == "n" {
+        return None;
+    }
+    FlexibleDate::from_str_future(&line)
 }
 
 pub(crate) fn get_yes_no_user_input(question: &str, default: &bool) -> bool {

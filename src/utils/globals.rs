@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use chrono::{Datelike, NaiveDate, Utc};
 
 const MONTHS: &'static [&'static str] = &[
@@ -43,7 +45,15 @@ pub fn get_current_weekday() -> u32 {
 pub fn read_as_month(s_in: &str) -> Option<usize> {
     let words: Vec<&str> = s_in.split_whitespace().collect();
 
-    let potential_month = words[0].trim().to_lowercase()[0..3].to_string();
+    let wd = words[0].trim().to_lowercase();
+    let mut potential_month = String::from("");
+    //
+    // Bißchen ungelenk, aber das "ä"
+    // in März macht bei month[0..3] Probleme
+    for c in [0, 1, 2] {
+        potential_month.push(wd.chars().nth(c).unwrap());
+    }
+
     if let Some(month) = MONTHS.iter().position(|m| m == &potential_month) {
         return Some(month + 1);
     } else if let Some(month) = MONATE.iter().position(|m| m == &potential_month) {
