@@ -1,0 +1,38 @@
+   Compiling suv v0.1.0 (/home/heiko/development/rust/suv)
+error[E0432]: unresolved import `crate::Student`
+ --> src/utils/files_n_folders.rs:3:5
+  |
+3 | use crate::Student;
+  |     ^^^^^^^^^^^^^^ no `Student` in the root
+  |
+help: consider importing this struct instead
+  |
+3 | use crate::thesis::Student;
+  |            ++++++++
+
+error[E0432]: unresolved import `crate::Thesis`
+ --> src/writer/mod.rs:8:13
+  |
+8 | use crate::{Thesis, utils::files_n_folders::get_thesis_folder};
+  |             ^^^^^^
+  |             |
+  |             no `Thesis` in the root
+  |             help: a similar name exists in the module: `thesis`
+  |
+  = help: consider importing this struct instead:
+          crate::thesis::Thesis
+
+error[E0599]: no method named `store_new` found for struct `Thesis` in the current scope
+  --> src/main.rs:37:20
+   |
+37 |             thesis.store_new(&suv_base.main_directory);
+   |                    ^^^^^^^^^ method not found in `Thesis`
+   |
+  ::: src/thesis/mod.rs:25:1
+   |
+25 | pub(crate) struct Thesis {
+   | ------------------------ method `store_new` not found for this struct
+
+Some errors have detailed explanations: E0432, E0599.
+For more information about an error, try `rustc --explain E0432`.
+error: could not compile `suv` (bin "suv") due to 3 previous errors
