@@ -3,10 +3,7 @@ use std::fs::{self, DirEntry, read_to_string};
 use crate::{
     parser::between,
     thesis::{Student, Thesis},
-    utils::{
-        FlexibleDate,
-        files_n_folders::{file_exists, folder_exists, parse_name},
-    },
+    utils::{FlexibleDate, files_n_folders::file_exists},
 };
 
 pub fn deserialize_theses(config: &str) -> Vec<Thesis> {
@@ -46,39 +43,10 @@ fn deserialize(path: &DirEntry) -> Option<Thesis> {
 
     let file_content = read_to_string(&file).unwrap();
     let student = Student {
-        last_name: tmp.1,
-        first_name: tmp.0,
+        last_name: tmp.0,
+        first_name: tmp.1,
         email: between(&file_content, "email:", "\n").trim().to_string(),
     };
 
-    // @todo: Strings als Konstanten ("Registration planned etc.")
-    // @todo: prüfen, ob :from_str_future hier nicht zu viel "future" hineininterpretiert?
-    let mut thesis = Thesis {
-        student: student,
-        title: between(&file_content, "title: ", "\n").trim().to_string(),
-        abgabedatum: FlexibleDate::from_str_future(
-            between(&file_content, "Submission planned: ", "\n").trim(),
-        ),
-        anmeldedatum: FlexibleDate::from_str_future(
-            between(&file_content, "Registration planned: ", "\n").trim(),
-        ),
-        schnell: between(&file_content, "Submission planned: ", "\n").trim() == "true",
-        interesse: between(&file_content, "## Interest\n", "\n#")
-            .trim()
-            .to_string(),
-        steps: between(&file_content, "## Next Steps\n", "\n#")
-            .trim()
-            .to_string(),
-        next_appointment: FlexibleDate::from_str_future(
-            between(&file_content, "Next appointment: ", "\n").trim(),
-        )
-        .to_string(),
-        todo: between(&file_content, "## To-Do (for me)", "#\n")
-            .trim()
-            .to_string(),
-    };
-
-    // println!("{:?} exists? {}", file, folder_exists(&file));
-    print!("{}", thesis);
-    None
+    Some(Thesis::from_string(student, &file_content))
 }

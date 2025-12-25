@@ -41,7 +41,7 @@ pub(crate) fn get_thesis_details_from_user() -> Thesis {
     new_thesis.schnell = get_yes_no_user_input("Eilt es?", &false);
     new_thesis.interesse = get_user_input("Interesse d. KandidatIn?", "");
     new_thesis.steps = get_user_input("Nächste Schritte d. KandidatIn?", "");
-    new_thesis.next_appointment = get_user_input("Nächstes Treffen?", "");
+    new_thesis.next_appointment = get_optional_user_date("Nächstes Treffen?", &None);
     new_thesis.todo = get_user_input("Meine nächsten Schritte?", "");
 
     new_thesis
