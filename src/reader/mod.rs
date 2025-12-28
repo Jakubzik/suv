@@ -1,4 +1,8 @@
 mod deserialize;
+use std::fmt::Debug;
+
+use chrono::NaiveDate;
+
 use crate::{reader::deserialize::deserialize_theses, thesis::Thesis, utils::ask_option};
 
 pub(crate) fn get_reading_options(config_path: &str) {
@@ -14,7 +18,8 @@ pub(crate) fn get_reading_options(config_path: &str) {
             list_current_thesis(theses);
         }
         1 => {
-            // list_next_steps(&theses);
+            println!("Nächste Termine\n=======================\n\n");
+            list_next_steps(theses);
         }
         2 => {
             println!("@todo ... muss mal programmiert werden");
@@ -27,8 +32,54 @@ pub(crate) fn get_reading_options(config_path: &str) {
 // Abgabedaten, nächsten Treffen und Schritten,
 // sortiert sie chronologisch, und gibt
 // eine entsprechende Liste aus
-fn list_next_steps() {
-    todo!()
+fn list_next_steps(theses: Vec<Thesis>) {
+    struct Step {
+        datum_int: Option<NaiveDate>,
+        datum_text: String,
+        description: String,
+    }
+
+    let mut steps: Vec<Step> = vec![];
+    for thesis in theses {
+        if thesis.abgabedatum.is_parsed {
+            steps.push(Step {
+                datum_int: thesis.abgabedatum.datum,
+                datum_text: format!("{:?}", thesis.abgabedatum),
+                description: format!("Abgabe '{}' von {}", thesis.title, thesis.student.last_name),
+            })
+        }
+        if thesis.anmeldedatum.is_parsed {
+            steps.push(Step {
+                datum_int: thesis.anmeldedatum.datum,
+                datum_text: format!("{:?}", thesis.anmeldedatum),
+                description: format!(
+                    "Anmeldung '{}' von {}",
+                    thesis.title, thesis.student.last_name
+                ),
+            })
+        }
+        if thesis.next_appointment.is_parsed {
+            steps.push(Step {
+                datum_int: thesis.next_appointment.datum,
+                datum_text: format!("{:?}", thesis.next_appointment.datum),
+                description: format!(
+                    "Nächste Verabredung '{}' ({})",
+                    thesis.title, thesis.student.last_name
+                ),
+            })
+        }
+
+        steps.sort_by(|t1, t2| t1.datum_int.cmp(&t2.datum_int));
+
+        for step in &steps {
+            let dtm = match step.datum_int {
+                Some(nd) => nd.format("%d.%m.%Y").to_string(),
+                _ => step.datum_text.to_string(),
+            };
+            println!("{}\n==========", dtm);
+            println!("{}\n", step.description.replace("'' von ", ""));
+        }
+    }
 }
 
 // Listet alle Namen von Studierenden auf,
