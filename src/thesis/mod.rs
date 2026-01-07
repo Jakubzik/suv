@@ -1,5 +1,9 @@
 use crate::parser::between;
 use crate::utils::FlexibleDate;
+use crate::utils::globals::{
+    KEY_INTEREST, KEY_IS_URGENT, KEY_NEXT_APPOINTMENT, KEY_NEXT_STEPS, KEY_REGISTRATION_PLANNED,
+    KEY_SUBMISSION_PLANNED, KEY_TITLE, KEY_TO_DO_SELF,
+};
 
 pub(crate) struct Student {
     pub(crate) last_name: String,
@@ -57,27 +61,50 @@ impl Thesis {
         Default::default()
     }
 
-    // @todo: Strings als Konstanten ("Registration planned etc.")
+    ///
+    /// Lange Texte sind im Markdown unter "# Langer Text\n..."
+    /// zu finden.
+    ///
+    /// Kurze Angaben (Titel der BA-Arbeit, Datumsangaben) zwischen
+    /// "key: HIER\n"
+    ///
+    /// Diese Hilfsfunktion liefert jeweils den Wert als String zurück
+    ///
+    /// @todo: wie geht .between um, wenn das Endzeichen nicht
+    /// kommt, sondern das Ende der Datei zuerst erreicht ist?
+    pub(crate) fn get_value_of(s_in: &str, key: &str) -> String {
+        let f_text = format!("{}\n", key);
+        let f_val = format!("{}: ", key);
+        match s_in.starts_with("#") {
+            true => between(s_in, &f_text, "\n#"),
+            false => between(s_in, &f_val, "\n"),
+        }
+        .trim()
+        .to_string()
+    }
+
     // @todo: prüfen, ob :from_str_future hier nicht zu viel "future" hineininterpretiert?
     pub(crate) fn from_string(student: Student, s_in: &str) -> Thesis {
         Thesis {
             student,
-            title: between(&s_in, "title: ", "\n").trim().to_string(),
-            abgabedatum: FlexibleDate::from_str_future(
-                between(&s_in, "Submission planned: ", "\n").trim(),
-            ),
-            anmeldedatum: FlexibleDate::from_str_future(
-                between(&s_in, "Registration planned: ", "\n").trim(),
-            ),
-            schnell: between(&s_in, "Submission planned: ", "\n").trim() == "true",
-            interesse: between(&s_in, "## Interest\n", "\n#").trim().to_string(),
-            steps: between(&s_in, "## Next Steps\n", "\n#").trim().to_string(),
-            next_appointment: FlexibleDate::from_str_future(
-                between(&s_in, "Next appointment: ", "\n").trim(),
-            ),
-            todo: between(&s_in, "## To-Do (for me)", "#\n")
-                .trim()
-                .to_string(),
+            // @todo: Überlegen: mit "\n" als End-Begrenzung funktioniert es u.U. (didn't check) nicht, wenn der Titel in der letzten Zeile steht.
+            title: Self::get_value_of(s_in, KEY_TITLE),
+            abgabedatum: FlexibleDate::from_str_future(&Self::get_value_of(
+                s_in,
+                KEY_SUBMISSION_PLANNED,
+            )),
+            anmeldedatum: FlexibleDate::from_str_future(&Self::get_value_of(
+                s_in,
+                KEY_REGISTRATION_PLANNED,
+            )),
+            schnell: Self::get_value_of(s_in, KEY_IS_URGENT) == "true",
+            interesse: Self::get_value_of(s_in, KEY_INTEREST),
+            steps: Self::get_value_of(s_in, KEY_NEXT_STEPS),
+            next_appointment: FlexibleDate::from_str_future(&Self::get_value_of(
+                s_in,
+                KEY_NEXT_APPOINTMENT,
+            )),
+            todo: Self::get_value_of(s_in, KEY_TO_DO_SELF),
         }
     }
 }

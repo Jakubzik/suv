@@ -14,6 +14,10 @@ use crate::{
 // Programmstart:
 // 0 - Neue Betreuung?
 // 1 - Vorhandene Einsehen?
+//   |
+//    - 0 Studierende auflisten
+//    - 1 Nächste Aktivitäten auflisten
+//    - 2 Archiv durchsuchen
 // 2 - Programm beenden
 fn main() {
     let suv_base = get_suv_folders(); // from config or from user.

@@ -1,3 +1,8 @@
+# version 0.0.4
+
+- direct command: suv list_next, list_all
+- Tests
+
 # version 0.0.3
 
 - Ask: add new or view files

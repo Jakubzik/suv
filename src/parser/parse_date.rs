@@ -1,4 +1,4 @@
-use chrono::{Days, NaiveDate};
+use chrono::{Days, NaiveDate, NaiveDateTime};
 
 use crate::{
     parser::date_calculation::{
@@ -37,17 +37,43 @@ impl FlexibleDate {
         if st.trim().is_empty() {
             return FlexibleDate::new_empty();
         }
+
+        // Volles Datum?
+        if let Ok(dtm) = NaiveDate::parse_from_str(st, "%d.%m.%Y") {
+            return FlexibleDate {
+                datum: Some(dtm),
+                month_only: false,
+                is_parsed: true,
+                input: st.to_string(),
+            };
+        };
+
+        // Übrig bleibt:
+        // April
+        // April 2026
         let words: Vec<&str> = st.split_whitespace().collect();
         if let Some(mon) = read_as_month(words[0]) {
-            let mut i_next_year = 0;
+            let mut i_next_year = 0; //get_year(0);
+
+            // Es wurde auch das Jahr angegeben
             if words.len() > 1
                 && let Ok(yr) = words[1].parse::<usize>()
             {
-                i_next_year = yr;
+                i_next_year = yr as i32;
             }
 
+            // Wenn kein Jahr übergeben wurde, und der Monat
+            // schon vorüber ist, müssen wir aufs kommende
+            // Jahr wechseln
             if i_next_year == 0 && mon <= get_current_month() as usize {
-                i_next_year = get_year(1) as usize;
+                i_next_year = get_year(1);
+            }
+
+            // dbg!(format!("{mon} <-> {}", get_current_month()));
+
+            // Im Zweifel das aktuelle Jahr einstellen
+            if i_next_year == 0 {
+                i_next_year = get_year(0);
             }
 
             return FlexibleDate {
@@ -121,7 +147,7 @@ mod test_parsing {
             },
             _ => FlexibleDate {
                 datum: Some(
-                    NaiveDate::parse_from_str(&format!("1.12.{}", get_year(1)), "%d.%m.%Y")
+                    NaiveDate::parse_from_str(&format!("1.12.{}", get_year(0)), "%d.%m.%Y")
                         .unwrap(),
                 ),
                 month_only: true,
@@ -146,7 +172,7 @@ mod test_parsing {
         let s_test_5 = "März";
         let fd_5 = FlexibleDate {
             datum: Some(
-                NaiveDate::parse_from_str(&format!("1.3.{}", get_year(1)), "%d.%m.%Y").unwrap(),
+                NaiveDate::parse_from_str(&format!("1.3.{}", get_year(0)), "%d.%m.%Y").unwrap(),
             ),
             month_only: true,
             is_parsed: true,

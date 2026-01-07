@@ -18,7 +18,7 @@ pub(crate) fn get_reading_options(config_path: &str) {
             list_current_thesis(theses);
         }
         1 => {
-            println!("Nächste Termine\n=======================\n\n");
+            println!("Nächste Termine\n=======================\n");
             list_next_steps(theses);
         }
         2 => {
@@ -39,6 +39,8 @@ fn list_next_steps(theses: Vec<Thesis>) {
         description: String,
     }
 
+    // Sammle die Daten -- Anmeldung, Abgabe, nächster Gesprächstermin --
+    // in Vec<Step> (um sie dann sortieren zu können)
     let mut steps: Vec<Step> = vec![];
     for thesis in theses {
         if thesis.abgabedatum.is_parsed {
@@ -62,23 +64,23 @@ fn list_next_steps(theses: Vec<Thesis>) {
             steps.push(Step {
                 datum_int: thesis.next_appointment.datum,
                 datum_text: format!("{:?}", thesis.next_appointment.datum),
-                description: format!(
-                    "Nächste Verabredung '{}' ({})",
-                    thesis.title, thesis.student.last_name
-                ),
+                description: format!("Nächste Verabredung mit {}", thesis.student.last_name),
             })
         }
+    }
 
-        steps.sort_by(|t1, t2| t1.datum_int.cmp(&t2.datum_int));
+    // Sortiere die gesammelten Daten
+    steps.sort_by(|t1, t2| t1.datum_int.cmp(&t2.datum_int));
 
-        for step in &steps {
-            let dtm = match step.datum_int {
-                Some(nd) => nd.format("%d.%m.%Y").to_string(),
-                _ => step.datum_text.to_string(),
-            };
-            println!("{}\n==========", dtm);
-            println!("{}\n", step.description.replace("'' von ", ""));
-        }
+    // Schreibe die nächsten anstehenden Termine
+    // in chronologischer Reihenfolge auf
+    for step in &steps {
+        let dtm = match step.datum_int {
+            Some(nd) => nd.format("%d.%m.%Y").to_string(),
+            _ => step.datum_text.to_string(),
+        };
+        println!("{}\n==========", dtm);
+        println!("{}\n", step.description.replace("'' von ", ""));
     }
 }
 
