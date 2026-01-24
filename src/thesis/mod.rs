@@ -2,7 +2,7 @@ use crate::parser::between;
 use crate::utils::FlexibleDate;
 use crate::utils::globals::{
     KEY_INTEREST, KEY_IS_URGENT, KEY_NEXT_APPOINTMENT, KEY_NEXT_STEPS, KEY_REGISTRATION_PLANNED,
-    KEY_SUBMISSION_PLANNED, KEY_TITLE, KEY_TO_DO_SELF,
+    KEY_SUBMISSION_PLANNED, KEY_TITLE, KEY_TO_DO_SELF, KEY_ZWEITGUTACHTER,
 };
 
 pub(crate) struct Student {
@@ -30,6 +30,7 @@ impl Student {
 pub(crate) struct Thesis {
     pub(crate) student: Student,
     pub(crate) title: String,
+    pub(crate) zweitgutachter: String,
     pub(crate) abgabedatum: FlexibleDate,
     pub(crate) anmeldedatum: FlexibleDate,
     pub(crate) schnell: bool,
@@ -52,6 +53,7 @@ impl Default for Thesis {
             steps: s_empty.clone(),
             next_appointment: FlexibleDate::new_empty(),
             todo: s_empty.clone(),
+            zweitgutachter: s_empty.clone(),
         }
     }
 }
@@ -105,6 +107,7 @@ impl Thesis {
                 KEY_NEXT_APPOINTMENT,
             )),
             todo: Self::get_value_of(s_in, KEY_TO_DO_SELF),
+            zweitgutachter: Self::get_value_of(s_in, KEY_ZWEITGUTACHTER),
         }
     }
 }

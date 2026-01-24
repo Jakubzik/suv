@@ -1,0 +1,85 @@
+   Compiling suv v0.1.0 (/home/heiko/development/rust/suv)
+warning: unused import: `NaiveDateTime`
+ --> src/parser/parse_date.rs:1:31
+  |
+1 | use chrono::{Days, NaiveDate, NaiveDateTime};
+  |                               ^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `FlexibleDate`
+ --> src/reader/deserialize.rs:6:13
+  |
+6 |     utils::{FlexibleDate, files_n_folders::file_exists},
+  |             ^^^^^^^^^^^^
+
+warning: unused import: `std::fmt::Debug`
+ --> src/reader/mod.rs:2:5
+  |
+2 | use std::fmt::Debug;
+  |     ^^^^^^^^^^^^^^^
+
+warning: unused variable: `parse_int_error`
+  --> src/utils/error.rs:41:28
+   |
+41 |             Kind::ParseErr(parse_int_error) => todo!(),
+   |                            ^^^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_parse_int_error`
+   |
+   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: field `example_usage` is never read
+  --> src/commands/mod.rs:37:5
+   |
+32 | pub(crate) struct Cmd {
+   |                   --- field in this struct
+...
+37 |     example_usage: Option<&'static str>,
+   |     ^^^^^^^^^^^^^
+   |
+   = note: `Cmd` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: field `check_format` is never read
+  --> src/utils/mod.rs:67:16
+   |
+64 | pub(crate) struct InputCheck {
+   |                   ---------- field in this struct
+...
+67 |     pub(crate) check_format: Option<fn(&str) -> bool>,
+   |                ^^^^^^^^^^^^
+
+warning: field `description` is never read
+  --> src/utils/error.rs:11:16
+   |
+ 8 | pub struct SuvError {
+   |            -------- field in this struct
+...
+11 |     pub(crate) description: String,
+   |                ^^^^^^^^^^^
+   |
+   = note: `SuvError` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: variant `ParseErr` is never constructed
+  --> src/utils/error.rs:16:5
+   |
+15 | pub enum Kind {
+   |          ---- variant in this enum
+16 |     ParseErr(std::num::ParseIntError),
+   |     ^^^^^^^^
+   |
+   = note: `Kind` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: function `get_names_and_titles` is never used
+  --> src/utils/files_n_folders.rs:35:15
+   |
+35 | pub(crate) fn get_names_and_titles(config_path: &str) -> Vec<String> {
+   |               ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `parse_name` is never used
+  --> src/utils/files_n_folders.rs:46:15
+   |
+46 | pub(crate) fn parse_name(name: &fs::DirEntry) -> String {
+   |               ^^^^^^^^^^
+
+warning: `suv` (bin "suv") generated 10 warnings (run `cargo fix --bin "suv" -p suv` to apply 4 suggestions)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.38s

@@ -57,12 +57,13 @@ impl Thesis {
             let file_path = format!(
                 "{}/{}_{}/{}_{}.md",
                 config_path,
-                self.student.last_name,
-                self.student.first_name,
+                self.student.last_name.to_lowercase(),
+                self.student.first_name.to_lowercase(),
                 self.student.last_name,
                 self.student.first_name
             );
 
+            println!("File path:  {}", file_path);
             let mut file = File::create(&file_path).expect("Konnte Datei nicht erstellen");
 
             file.write_all(self.to_string().as_bytes())

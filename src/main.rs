@@ -1,3 +1,4 @@
+mod commands;
 mod config;
 mod parser;
 mod reader;
@@ -7,52 +8,44 @@ mod utils;
 mod writer;
 
 use crate::{
-    config::get_suv_folders, reader::get_reading_options, ui::get_thesis_details_from_user,
-    utils::ask_option,
+    commands::Cmd,
+    config::get_suv_folders,
+    utils::{ask_sub_option, globals::COMMANDS},
 };
 
 // Programmstart:
-// 0 - Neue Betreuung?
-// 1 - Vorhandene Einsehen?
+// 1 - Neue Betreuung?
+// 2 - Vorhandene Einsehen?
 //   |
-//    - 0 Studierende auflisten
-//    - 1 Nächste Aktivitäten auflisten
-//    - 2 Archiv durchsuchen
-// 2 - Programm beenden
+//    - 2-1 Studierende auflisten
+//    - 2-2 Nächste Aktivitäten auflisten
+//    - 2-3 Archiv durchsuchen (@todo)
+// 3 - Programm beenden
+// 4 - Programmversion nennen
 fn main() {
     let suv_base = get_suv_folders(); // from config or from user.
 
-    let s_options = vec![
-        "Neue Betreuung erfassen".to_string(),
-        "Vorhandene Daten einsehen".to_string(),
-        "SUV beenden".to_string(),
-    ];
-
     let cmd = match std::env::args().nth(1) {
-        Some(arg1) => get_command(arg1),
-        _ => ask_option("Was möchtest du machen?", &s_options),
+        Some(arg1) => get_command(&arg1),
+        _ => ask_sub_option("Was möchtest du machen?", 1, ""),
     };
 
-    match s_options.iter().position(|a| a == &cmd).unwrap() {
-        0 => {
-            let thesis = get_thesis_details_from_user();
-            thesis.store_new(&suv_base.main_directory);
-            println!("OK");
-        }
-        1 => {
-            get_reading_options(&suv_base.main_directory);
-        }
-        2 => {
-            println!("Tschüüüsss");
-        }
-        _ => panic!("Noch nicht programmiert"),
-    }
+    (cmd.call)(&std::env::args(), &suv_base);
 }
 
-fn get_command(arg1: String) -> String {
-    match &arg1[..] {
-        "add" | "new" => String::from("Neue Betreuung erfassen"),
-        "list" | "show" => String::from("Vorhandene Daten einsehen"),
-        _ => String::from("SUV beenden"),
+// Nutzereingabe soll Funktion, Beschreibung etc. liefern
+//
+// get_command("new") -> Cmd{option_code: 1, ...}
+fn get_command(user_input: &str) -> Cmd {
+    match COMMANDS
+        .cmds
+        .iter()
+        .find(|b| b.command.contains(&user_input))
+    {
+        Some(command) => command.to_owned().to_owned(),
+        None => {
+            println!("\n\nSorry, Befehl `{}` verstehe ich nicht.", user_input);
+            std::process::exit(1);
+        }
     }
 }

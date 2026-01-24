@@ -7,7 +7,7 @@ use std::{
 use crate::{
     parser::between,
     utils::{
-        get_user_input,
+        InputCheck, get_user_input,
         globals::{CONFIG_FILE, EXIT_CODE_NO_HOME_DIR},
     },
 };
@@ -52,22 +52,35 @@ pub(crate) fn get_suv_folders() -> SuvFolder {
 /// and for directory containing the archive.
 fn edit_config() -> SuvFolder {
     let mut home_dir = String::from("");
+    // @todo: das ist bloß qnd, muss nachdenken, was benötigt wird.
+    let s_folders = get_suv_folders();
+    let ci = InputCheck {
+        must_not_be_empty: true,
+        default_value: s_folders.main_directory,
+        check_format: None,
+    };
 
+    let ci_archive = InputCheck {
+        must_not_be_empty: true,
+        default_value: s_folders.archive_directory,
+        check_format: None,
+    };
     if let Ok(value) = std::env::var("HOME") {
         home_dir = format!("{}/{}", &value, &CONFIG_FILE);
     } else {
         println!("There's no $HOME set. Sorry, I cannot function under these circumstances");
     }
 
-    let s_folders = get_suv_folders();
-    let s = s_folders.main_directory;
+    // @Fehlermanagement (unwrap!)
+    let line_dir =
+        get_user_input("Please enter the folder containing the `suv` files:", &ci).unwrap();
 
-    let line_dir = get_user_input("Please enter the folder containing the `suv` files:", &s);
-
+    // @Fehlermanagement (unwrap!)
     let line_archive = get_user_input(
         "Please enter the folder containing the `suv` ARCHIVE:",
-        &s_folders.archive_directory,
-    );
+        &ci_archive,
+    )
+    .unwrap();
 
     let ret = SuvFolder {
         main_directory: line_dir.trim().to_string(),

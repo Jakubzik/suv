@@ -1,8 +1,14 @@
 use chrono::Days;
+
+use crate::commands::{Commands, init_commands};
+
+// use crate::commands::cmd_interpreter::{Commands, init_commands};
 pub(crate) const EXIT_CODE_NO_HOME_DIR: i32 = 1;
 // const VERSION: &str = "0.0.2, Nov 7, 2025 (hj)";
 // const VERSION: &str = "0.0.3, Dec 5, 2025 (hj)";
-pub(crate) const VERSION: &str = "0.0.4, Dec 14, 2025 (hj)";
+// pub(crate) const VERSION: &str = "0.0.4, Dec 14, 2025 (hj)";
+// pub(crate) const VERSION: &str = "0.0.5, Jan 16, 2026 (hj)";
+pub(crate) const VERSION: &str = "0.0.6, Jan 24, 2026 (hj)";
 pub(crate) const CONFIG_FILE: &str = ".config/suv/suv.rc";
 
 // Bezeichnungen der erkennbaren Items in
@@ -15,8 +21,10 @@ pub(crate) const KEY_NEXT_STEPS: &str = "## Next Steps";
 pub(crate) const KEY_IS_URGENT: &str = "Eilig";
 pub(crate) const KEY_NEXT_APPOINTMENT: &str = "Next appointment";
 pub(crate) const KEY_TO_DO_SELF: &str = "## To-Do (for me)";
+pub(crate) const KEY_ZWEITGUTACHTER: &str = "Zweitgutachter";
 
 pub(crate) const TIME_FOR_BA_PAPER_PRODUCTION: Days = Days::new(63);
+pub(crate) const COMMANDS: &Commands = init_commands();
 pub(crate) const MONTHS: &[&str] = &[
     "January",
     "February",

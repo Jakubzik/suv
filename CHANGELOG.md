@@ -1,3 +1,18 @@
+# version 0.0.7
+
+- wenn's keine nächsten Schritte gibt, entsprechende Mitteilung
+- manpage aktualisieren
+- keine `panic` bei unbekanntem Befehl
+
+# version 0.0.6
+
+- Fehler "SuvError"
+
+# version 0.0.5
+
+- Umsortieren der Commands in vernünftigere Module
+- `version`
+
 # version 0.0.4
 
 - direct command: suv list_next, list_all
@@ -19,7 +34,7 @@ Created Github repo.
 
 # Unreleased
 
-
+[ ] Zweitgutachter eintragen können
 [ ] make .edit_config suggest `$suv_folder/suv/archive` as default for an archive (in main.rs/get_suv_folder)
 [ ] Refine add thesis in ui/mod.rs get_thesis_details_from_user
   [ ] thesis title
@@ -33,3 +48,4 @@ Created Github repo.
 [ ] Decide about cli interface (dialoguer?)\
 
 # History
+[x] Bugfix: teilw. Großschreibung der Namen führt zu blöden Problemen beim Speichern einer neuen Thesis. [0.0.5]

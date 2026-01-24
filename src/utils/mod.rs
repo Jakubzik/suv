@@ -1,11 +1,18 @@
 use core::fmt;
 use std::io;
+pub(crate) mod error;
 pub(crate) mod files_n_folders;
 pub(crate) mod globals;
 
 use chrono::{Datelike, NaiveDate};
 
-use crate::utils::globals::MONTHS;
+use crate::{
+    commands::Cmd,
+    utils::{
+        error::{Kind, SuvError},
+        globals::{COMMANDS, MONTHS},
+    },
+};
 
 // @todo
 // - Dateiproduktion verbessern
@@ -54,13 +61,20 @@ impl FlexibleDate {
     }
 }
 
+pub(crate) struct InputCheck {
+    pub(crate) must_not_be_empty: bool,
+    pub(crate) default_value: String,
+    pub(crate) check_format: Option<fn(&str) -> bool>,
+}
+
 /// Minimal way to ask the user for input
 /// on a terminal
-pub(crate) fn get_user_input(question: &str, default: &str) -> String {
+// pub(crate) fn get_user_input(question: &str, default: &str) -> String {
+pub(crate) fn get_user_input(question: &str, check: &InputCheck) -> Result<String, SuvError> {
     println!("suv -> {}", question);
 
-    if !default.is_empty() {
-        println!("(Empty for `{}`)", &default);
+    if !check.default_value.is_empty() {
+        println!("(Empty for `{}`)", &check.default_value);
     }
 
     let mut line = String::from(" ");
@@ -70,9 +84,15 @@ pub(crate) fn get_user_input(question: &str, default: &str) -> String {
         .expect("Something went wrong trying to read your input"); // @todo
 
     if line.trim().is_empty() {
-        default.to_string()
+        if check.must_not_be_empty {
+            return Err(SuvError {
+                kind: Kind::UserInputErr(std::io::Error::last_os_error()),
+                description: "Leere Antworten sind hier nicht erlaubt.".to_string(),
+            });
+        }
+        Ok(check.default_value.clone())
     } else {
-        line.trim().to_string()
+        Ok(line.trim().to_string())
     }
 }
 
@@ -130,17 +150,75 @@ pub(crate) fn get_yes_no_user_input(question: &str, default: &bool) -> bool {
         line.parse().unwrap_or_default() // <-- @todo
     }
 }
-pub(crate) fn ask_option(question: &str, options: &[String]) -> String {
-    for (index, option) in options.iter().enumerate() {
-        println!("{index} -- {option}");
+
+/// Frage die
+// pub(crate) fn ask_option(question: &str) -> Cmd {
+//     for cmd in COMMANDS.cmds {
+//         println!("{}", cmd.get_option_string());
+//     }
+//     println!();
+//     let s = get_user_input(question, "").trim().to_lowercase();
+
+//     if let Some(res) = COMMANDS.get_by_code(&s) {
+//         return res.to_owned().to_owned();
+//     }
+//     panic!("@todo, Command not known, needs programming");
+// }
+
+pub(crate) fn ask_sub_option(question: &str, level: u8, code_filter: &str) -> Cmd {
+    let options = COMMANDS.cmds.iter().filter(|c| {
+        c.option_level == level
+            && (level == 1 || c.option_code.starts_with(&format!("{}-", code_filter)))
+    });
+    // Welche Optionen (Befehle) gibt es?
+    for cmd in options {
+        let s = cmd.get_option_string();
+        if cmd.option_level > 1 {
+            println!("{}", &s[s.find("-").unwrap() + 1..]);
+        } else {
+            println!("{}", s);
+        }
     }
     println!();
-    let s = get_user_input(question, "").trim().to_lowercase();
-    match s.parse::<usize>() {
-        Ok(u) => match options.get(u) {
-            Some(response) => response.to_string(),
-            None => panic!("Not understood, @todo needs programming"),
-        },
-        Err(e) => panic!("@todo, needs programming {e}"),
+
+    let s = match level > 1 {
+        // @todo InputCheck ist nur zum Kompilierbarmachen ausgefüllt, needs thought
+        true => {
+            format!(
+                "{}-{}",
+                code_filter,
+                get_user_input(
+                    question,
+                    &InputCheck {
+                        must_not_be_empty: true,
+                        default_value: "".to_string(),
+                        check_format: None,
+                    }
+                )
+                .unwrap()
+                .trim()
+                .to_lowercase(),
+            )
+        }
+        _ => format!(
+            "{}",
+            // @todo: InputCheck needs thinking
+            get_user_input(
+                question,
+                &InputCheck {
+                    must_not_be_empty: true,
+                    default_value: "".to_string(),
+                    check_format: None
+                }
+            )
+            .unwrap()
+            .trim()
+            .to_lowercase()
+        ),
+    };
+
+    if let Some(res) = COMMANDS.get_by_code(&s) {
+        return res.to_owned().to_owned();
     }
+    panic!("@todo, Command not known, needs programming");
 }
